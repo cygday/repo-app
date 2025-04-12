@@ -1,0 +1,519 @@
+this is tutorail for docker
+
+#build the image
+docker build -t myapp:v1-> -t = tag, v1 is tag
+
+#ship the image to docker hub
+docker push container_name/myapp:v1
+
+#run the container
+docker run -p --name container_Name -p 8080:80 image_Name:tag
+
+componenets of docker
+Dockerfile-> file to build an image
+Docker compose-> a tool for defining and running multi-container Docker apps
+Docker swarm -> docker's native clustering and orchestration solution
+Docker network -> facilitates communication between docker containers
+docker volume -> provides persistent storaege for container data
+
+use cases for docker:
+microservices architecture-> deploy and scale individuall services independently
+CI/CD -> streamline development and deployment process.
+development environments-> create consistent development environments across teams
+application isolation -> run multiple versions oof apllication on the same host
+legacy application migration -> containerize legacy applications for easier managemnt
+ and deployment
+
+how to install docker
+run the following command to download and execute docker installation 
+wget -q0- https://get.docker.com | sh
+
+once the installation is complete
+sudo systemctl start docker
+
+enable docker to start on boot
+sudo systemctl enable docker
+
+post installtino steps
+verify the installatino 
+
+docker version
+docker run hello-world
+
+add your user to the docker group to run docker commands without sudo
+sudo usermod -aG docker $USER
+
+common installation problems
+
+permision denied-> ensure you've added your user to the docker group/ use sudo
+docker daemon not running ->sudo systemctl start docker
+
+conflict with virtualbox-> hyperv enabled, use docker toolbox
+
+insufficient system resources -> increase your system's/vm's allocated RAM if
+ needed
+
+docker basic commands
+docker ps -a
+docker stop container_name
+docker start container_name
+docker restart container_name
+docker rm container_name
+docker rm -f container_name
+
+running container's in different mode
+docker run -d image_name -> -d denote detached mode
+docker run -it image_name /bin/bash -> -it denote interactive mode
+
+port mapping
+docker run -p host_port:container_port image_name
+
+work wiht container logs
+docker logs conatianer_id_or_name
+docker logs -f container_id_Or_name -> -f denote in real-time
+
+executing commands in container
+docker exec -it container_id/name /bin/bash
+
+example: running an apache container
+
+docker pull httpd -> pull the image
+docker run -d --name my-apache -p 8080:80 httpd -> run the container
+docker ps -> verify its running
+http://localhost:8080 -> access the default page by opening a web browser
+docker exec -it my-apache /bin/bash
+echo "<h1>hello from apache</h1>" > /usr/local/apache2/htdocs/index.html
+
+container resource managemnet
+
+docker run -d --memory=512m image_name -> run container with memory limit
+docker run -d --cpus=0.5 image_name -> run container with cpu limit
+
+container network
+docker network ls -> list the network
+docker network create my_network -> creates my_network
+docker run -d --network my_network --name my_container image_name-> connecting
+ container to a a network
+
+data persistence with volume
+docker volume create my_vol -> creating a volume
+docker run -d -v my_vol:/path/in/container image_name -> run a container with volume
+
+cleaning up
+docker container prune->remove all stopped container
+docker system prune -> remove all unused resources(contianer,network, volume)
+
+work with docker images
+docker images -> list all images
+docker image ls -> use the more verbose command
+
+pulling image from docker hub
+docker pull image_Name:tag
+
+running a container from image
+docker run -d image_Name:tag
+
+image information
+docker inspect image_name:tag->detailed information about an image
+
+remove image
+docker rmi image_name:tag
+docker image rm image_name:tag
+docker image prune -> remove all unused images
+
+building custom images
+
+using dockerfile
+create a file named Dockefile without extension
+define instructions to build an image
+example:
+	FROM ubuntu:20.04
+	RUN apt-get update && apt-get install nginx -y
+	COPY ./my-nginx.conf /etc/nginx/nginx.conf
+	EXPOSE 80
+	CMD ["nginx","-g","daemon off;"]
+
+docker build -t my-nginx:v1 .
+
+building from a running containre
+docker commit container_Id/name image-name:tag
+
+image tag
+docker tag sourcr_image:tag target_image:tag
+
+push image to docker hub
+docker login -> login to docker hub
+docker login username -u
+
+image layers and caching
+each instruction in a dockerfile creates a new layer
+layers are cached and reused in subsequent builds
+ordering instructions from least to most frequently changing can speed up
+builds
+
+example:
+	FROM ubuntu:20.04
+	RUN apt-get update && apt install nginx -y 
+	COPY ./static-files /var/www/html
+	COPY ./config-files /etc/nginx
+
+multi-stage builds
+it builds allow you to use multiple FROM statements in your Dockerfile. this
+is useful for creating smaller production images.
+Example:
+	#build stage
+	FROM golang:1.16 AS build
+	WORKDIR /app
+	COPY . .
+	RUN go build -o myapp
+
+	#production stage
+	FROM alpine:3.14
+	COPY --from=build /app/myapp /usr/local/bin/myapp
+	CMD ["myapp"]
+
+image scanning and security
+docker scan image_name:tag -> it provides build-in image scanning capabilities.
+
+best practices for working with images
+-use specific tags instead of latest for reproducibility
+-keep images small by using minimal base images and multi-stage builds
+-use .dockerignore to exclude unnecessary files from the build context.
+-levereage build cache by ordering Dockerfile instructions effectively.
+-regularly update base images to get security patches.
+-scan images for vulnerabilities before deployment
+
+image managemnet and cleanup
+docker system prune -a -> removes all unused images, not just dangling ones
+
+dockefile => to create a docker image
+FROM ubuntu:20.04 -> it initializes a new build stage, there may be twoFROM
+	instructions in a single dockerfile for multi stage builds
+LABEL version="1.0" -> it adds metadata to an image in key-value pair format
+ENV APP_HOME=/app NODE_ENV=production
+WORKDIR /app -> it sets the working directory for andy subsequent run,cmd,entrypoint
+COPY and ADD -> copy files from the host into the image
+	COPY package.json
+	ADD https://example.com/big.tar.xz /usr/src/things/
+RUN apt-get update && apt-get install -y nodejs -> executes commands in a new
+layer on top of the current image and commits the results. its a best practice
+to chain commands with && and clean up in the same RUN instruction to
+keep layers small.
+CMD ["node","app.js"] -> it provides defaults for an executing container.
+ENTRYPOINT ["nginx", "-g", "daemon off;"] -> it configures a container that
+	will run as an executable
+EXPOSE 80 443 -> it informs docker that the container listens on specified
+	network ports at runtime 
+VOLUME /data -> it creates a mount point and marks it as holding externally
+	mounted volumes from native host or other containers
+ARG VERSION=latest -> it defines a variable that users can pass at build-time
+	to the builder with the docker build command
+
+best practices for writing dockerfiles
+-use multi-stage builds:
+	FROM node:14 AS build
+	WORKDIR /app
+	COPY package*.json ./
+	RUN npm install
+	COPY . .
+	RUN npm run build
+	
+	FROM nginx:alpine
+	COPY --from=build /app/dist /usr/share/nginx/html
+	
+2.minimize the number of layers:
+3.leverage build cache
+4.use .dockerignore
+5.don't install unnecessary packages
+6.use specific tags
+7.set the workdir
+8.use copy instead of ADD
+9. use environment variables
+
+docker networking
+bridge-> default network driver, needs to communicate
+host-> removes network isolation between container and docker host
+overlay-> enables communication between containers across multiple Docker
+	daemon host.
+macVlan->assigns a mac address to a container, making it appear as a physical
+	device on the network
+none->disables all networking for a container
+network plugins->allow you to use third-party network drivers.
+
+docker network ls->list network
+docker network inspect my_network->  inspecting network
+docker network create --driver bridge --subnet 172.18.0.0/16 -gateway 172.18.0.1
+ my_network_name
+
+connecting containers to networkds
+docker run --network network_name image_name
+docker network connect network_name container_name
+
+disconnecting containers from networks
+docker network disconnect network_name container_name
+
+to remove network
+docker network rm network_name
+
+overlay network->used in docker swarm mode to enable communication between
+containers across multiple docker daemon hosts.
+
+docker network create --driver overlay my_overlay -> create overlay network
+
+docker service create --network my_overlay --name my_srv nginx -> creating a 
+service in swarm mode, you can attach it to this network
+
+network troubleshooting
+1.container-container communication: use docker exec command to get into a 
+container and use tools like ping, curl or wget to test connectivity
+2.network inspection : use docker network inspect to view detailed information
+about a network
+3.port mapping: use docker port container_Name to see the port mappings for a
+container
+4.dns issues: check the /etc/resolv.conf file inside the container to verify
+dns settings
+5.network namespace: for advanced troubleshooting, you can enter the network
+namespace of a container:
+pid=$(docker inspect -f '{{.State.Pid}}' <container_name>) nsenter -t $pid -n
+ip addr
+
+best practices:
+use custom bridge networks instead of the default bridge network for better
+isolation and built-in DNS resolution
+use overlay networkds for multi-host communication in swarm mode
+use host networking sparingly and only when high performance is required
+be cautious with exposing ports, only expose what's necessary.
+use docker compose for mananging multi-container applications n their networks
+
+network encryption
+docker network create --opt encrypted --driver overlay my_secure_network ->
+for overlay networks, you can enable encryption to secure container-container
+traffic
+	
+docker volumes
+named volumes: 
+docker run -d --name containre_Name -v my_volume:/app nginx:latest
+
+anonymous volumes:
+docker run -d --name container_name -v /app nginx:latest
+
+bind mounts:
+docker run -d --name container_Name -v /path/on/host:/app nginx:latest
+
+docker volume ls -> list volumes
+
+docker volume inspect my_vol -> inspecting volume
+
+docker volume rm my_vol -> removing volume
+
+docker volume prune -> remove unused volume
+
+docker run --rm -v my_vol:/source -v /path/on/host:/backup ubuntu tar cvf
+/backup/backup.tar /source -> backup volume
+
+docker run --rm -v my_vol:/target -v /path/on/host:/backup ubuntu tar xvf
+/backup/backup.tar -C /target --strip 1
+
+docker volume create --driver driver_name my_vol -> use a specfic volm driver
+
+best practices for using docker volumes:
+1.use named volumes
+2.dont use bind mounts in production
+3.use volumes for databases
+4.be cautious with permissions
+5.clean up unused volumes
+6.use volume labels: docker volume create --label project=myapp my_vol
+7.conside using docker compose-> it makes it easier to manage volumes across
+multiple containers.
+
+sharing volumes between containers
+docker run -d --name container1 -v my_vol:/app nginx:latest
+docker run -d --name container2 -v my_vol:/app nginx:latest
+
+docker compose -> its a powerful tool for defining and running multi-container
+docker applications. it use a yaml file to configure your applications service
+s, networkds and volumes. with a single command, you create and start all the
+services from your configuration
+
+benefits of docker compose: simplicity, reproducibility, scalability, environ
+ment consistency, workflow improvement
+
+docker-compose.yml->it defines all the components and configurations of 
+your application.
+example:
+	version: '3.8'
+	services:
+	 web:
+	  build:
+	  ports:
+	   -"5000:5000"
+	  volumes:
+	   -.:/code
+	  environment:
+	   FLASK_ENV:development
+	 redis:
+	  image: "redis:alpine"
+version -> it specifies the compose file format version
+services->it defines the containers that make up your app
+web->a service based on an image built from the dockerfile in the current
+	directory
+redis-> a service using the public redis image
+
+basic docker compose commands
+docker compose up -> create and start containers
+docker compose up -d -> run in detached mode
+docker compose down -> stop and remove containers, network, images and volums
+docker compose ps -> list containers
+docker compose logs -> view output from containers
+docker compose logs -f web -> follow logs from teh web service
+
+practical example:
+
+Example 1: WordPress with MySQL
+version: '3.8'
+services:
+ db:
+  image: mysql:5.7
+  volumes:
+   - db_data:/var/lib/mysql
+  restart: always
+  environment:
+   MYSQL_ROOT_PASSWORD: somewordpress
+   MYSQL_DATABASE: wordpress
+   MYSQL_USER: wordpress
+   MYSQL_PASSWORD: wordpress
+ wordpress:
+  depends_on:
+   - db
+  image: wordpress:latest
+  ports:
+   - "8000:80"
+  restart: always
+  environment:
+   WORDPRESS_DB_HOST: db:3306
+   WORDPRESS_DB_USER: wordpress
+   WORDPRESS_DB_PASSWORD: wordpress
+   WORDPRESS_DB_NAME: wordpress
+volumes:
+db_data: {}
+
+to run this setup : save .yml, in same directory run docker compose up -d,
+once the containers are running, access wordpres by http://localhost:8000
+in browser
+
+best practice for docker compose
+1.use version control for your docker-compose.yml file
+2.keep development, staging and production environments as similar as possible
+3. use build arguments and environments variables for flexibility
+4.leverage healthchecks to ensure service dependencies are met
+5.use .env files for environment-specific variables.
+6.optimise your images to keep them small and effiecient.
+7. use docker-compose.override.yml for local development settings.
+
+scaling services:
+docker compose can scale services with a single command
+docker compose up -d -scale web=3-> it start 3 instances of the web service
+
+docker security:
+it is a critical aspect of working with docker, especially in production envir
+onments. its important security practices to help you build and maintain
+secure docker environments
+
+keep docker updated
+sudo apt-get update
+sudo apt-get upgrade docker-ce
+
+use official images
+ version: '3.8'
+ services:
+  web:
+   image: nginx:latest #official nginx image
+
+scan images for vulnerabilities
+use tools like docker scout or trivy to scan your images for vulnerabilities
+docker scout cve image_name
+
+limit container resources: prevent denial of service attacks by limiting
+container resources:
+	version: '3.8'
+	services:
+	 web:
+	  images: nginx:latest
+	  deploy:
+	   resources:
+	    limits:
+	     cpus: '0.50'
+	     memory: 50M
+
+use non-root users: run containers as non-root users to limit the potential
+impact of a container breach
+	FROM node:14
+	RUN groupadd -r myapp && useradd -r -g myapp myuser
+	USER myuser
+
+use secret management: for sensitive data like passwords and api keys, use
+docker secrets:
+	echo "mysecretpassword" | docker secret create db_password -
+then in your docker-compose.yml
+	version: '3.8'
+	services:
+	 db:
+	  image: mysql
+	  secrets:
+	   - db_password
+	secrets:
+	 db_password:
+	  external: true
+
+enable content trust: sign and verify image tags:
+	export DOCKER_CONTENT_TRUST=1
+	docker push myrepo/myimage:latest
+
+use read=only containers: when possible, run containers in read-only mode:
+	version: '3.8'
+	services:
+	 web:
+	  image: nginx
+	  read_only: true
+	  tmpfs:
+	    - /tmp
+	    - /var/cache/nginx
+
+implement network segmentation: use docker networks to isolate containers:
+	version: '3.8'
+	services:
+	 frontend:
+	  networks:
+		- frontend
+	 backend:
+	  networks:
+		- backend
+	networks:
+	 frontend:
+	 backend:
+
+regular security audits
+use security-enhanced linux(SELinux) or apparmor: these provide an additional
+layer of security. ensure they're enabled and properly configured on your
+host system
+
+implement logging and monitoring: use dockers' logging cpabilities and 
+consider integrating with external monitoring tools:
+version: '3.8'
+services:
+ web:
+  image: nginx
+  logging:
+   driver: "json-file"
+   options:
+    max-size: "200k"
+    max-file: "10"
+    
+    
+    
+    
+put evrything on git
+write dockerfile and image and run container and push it to dockerhub
+pull, commit and push
+
+
