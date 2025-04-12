@@ -1,0 +1,12 @@
+#use a minimal base image
+FROM ubuntu:20.04
+
+#install only essential dependencies in a single run statement
+RUN apt-get update && apt-get install -y curl bash && rm -rf /var/lib/apt/lists/*
+
+#copy only necessary file and exclude unnecessary ones using .dockerignore
+#copy . /app
+
+#set the working directory and default cmd
+#cmd ["./myapp"]
+
