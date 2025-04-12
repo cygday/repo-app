@@ -1,0 +1,239 @@
+install harbor 
+dcoker compose
+
+docker compose installation
+from repository:
+wget https://github.com/docker/compose/releases/download/v2.34.0/docker-compose-linux-x86_64
+
+rename
+mv docker-compose-linux-x86_64 docker-compose
+
+sudo mv docker-compose /usr/local/bin
+ls -l /usr/local/bin/docker-compose
+
+sudo chmod +x /usr/local/bin/docker-compose
+
+sudo rm /usr/local/bin/docker-compose
+
+from plugin:
+sudo apt-get install docker-compose
+
+docker-compose standalone installation
+
+docker compose ->plugin
+
+it needs yaml file
+
+project simple:
+mkdir demo-project
+vim app.py
+vim requrirement.txt
+ls 
+app.py requirement.txt
+
+vim dockerfile
+copy from docker docs .com
+paste and save 
+vim compose.yaml
+ version: 
+ services:
+ 	web:
+	build: .
+	ports:
+	- "8000:5000"
+	redis:
+	image:"redis:alpine"
+save and run
+docker compose up
+check from another terminal
+
+docker service stop
+dcoker compose start
+docker compose stop
+
+docker container ps
+
+two container running 
+
+docker compose down to delete
+
+
+front end-wordpress and database
+docker-compose.yml edit
+services:
+   mysql_db:
+    container_name: mysql_db_container
+    image:mysql:8.0
+    restart:always
+    environment:
+      MYSQL_ROOT_PASSWORD:"$MYSQL_ROOT_PASSWORD"
+      MYSQL_DATABASE:"$MYSQL_DATABASE"
+      MYSQL_USER:"$MYSQL_USER"
+      MYSQL_PASSWORD:"$MYSQL_PASSWORD"
+      networks:
+      	-mywpnetwork
+	volumes:
+	  - db_vol:/var/lib/mysql
+     web_service:
+       container_name:wp_container
+       depends on :
+         - mysql_db
+	image:wordpress
+	restart:always
+	ports:
+	  - "4000:80"
+	environment:
+	  WORDPRESS_DB_HOST:"$WORDPRESS_DB_HOST"
+	  WORDPRESS_DB_USER:"$WORDPRESS_DB_USER"
+	   WORDPRESS_DB_PASSWORD:"$WORDPRESS_DB_PASSWORD"
+	   WORDPRESS_DB_NAME:"$WORDPRESS_DB_NAME"
+	networks:
+	  - mywpnetwork
+	volumes:
+	  -wordpress_vol:/var/www/html
+networks:
+  mywpnetworks
+
+volumes:
+
+wordpress_vol:
+ db_vol:
+
+mkdir multi image
+cd multi image
+cat > compose.yml
+
+docker compose up
+this .env file is searched by compose while running, save this file 
+.env file for docker-compose.yml
+      MYSQL_ROOT_PASSWORD:"root@123"
+      MYSQL_DATABASE:"wordpress"
+      MYSQL_USER:"demouser"
+      MYSQL_PASSWORD:"demo@123"
+
+	  WORDPRESS_DB_HOST:"mysql_db"
+	  WORDPRESS_DB_USER:"demouser"
+	   WORDPRESS_DB_PASSWORD:"demo@123"
+	   WORDPRESS_DB_NAME:"wordpress"
+
+docker orchestration:
+containerised application manage, scaling
+and networking
+docker swarm, kubernetes, apache mesos
+
+kuberenets is one of the top ranked project
+on github
+
+multivm vagrant
+
+github swarm vagrantfile->multivm vagrantfile
+
+vagrant up
+
+vagrant ssh manager01
+vagrant ssh worker01
+run on separate terminal both
+
+sudo docker system system info | grep -i  Swarm
+state of swarm shows
+
+docker swarm init 
+couldnot intitialize
+
+ip addr show
+
+docker swarm init --advertise-addr 192.168.56.11
+
+shows to run worker add this ocmmand
+
+docker swarm join --token SWMTKN-1-4.....
+
+copy and paste the above command into worer machine
+
+on first manager machine
+docker node ls
+shows hostname manager01
+
+on second machine after copy paste
+shows this node joined a swarm as a worker
+
+how to watch the swarm
+sudo docker system info | grep -i swarm
+
+to check details of node
+docker node inspect manager01 --preety
+
+docekr node isnpect worker01
+
+how to change worker node to manager
+
+docker node promote worker01
+ger101
+
+
+
+docker node ls
+
+on worker01 node
+docke rnode ls
+
+docker node swarm leave
+
+docker node rm manager01
+
+status active, pause, drain
+
+to change it
+docker node update --availabilitu pasue 
+worker01
+
+docker swarm leave -> on worker0-1
+
+docker node rm worker01 ->on mana
+
+docker system info | grep -i swafrm
+
+how to run application from swarm
+cluster
+
+nginx 
+
+docker service create -d --name nginxsrv
+-p [hostport:contport] --replicas
+3 nginx
+
+docker service ls
+docker service ps niginxsrv
+dicjer service ligs [name]
+
+docker service ls
+docker service scale nginxsrv=2
+
+docker service ls
+
+docker service logs nginxsrv
+docker service ps nginxsrv
+
+network
+
+docker network create -d overlay my_ovnetwrk
+
+docker network ls
+docker network inspect my_ovnetwork
+
+docker network create -d overlay -opt encrypted myovnetwork1
+
+plugin
+
+docker plugin ls
+docker plugin install 
+
+docker stack/portainer
+
+
+
+
+
+
+
+
