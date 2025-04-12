@@ -1,0 +1,350 @@
+version control system
+local, distributed(each user has a complete local copy of a repository on his compupter) and centralized(server is the master repository which contains all of versions of the code)
+it keeps track of evry modification to the code in a special kind of database
+
+git - distributed version control system, CTMS(content tracking managemnet system)key terminologies-> repository, working directory, stagin area, commit , remote repository(github) main branch->branches in git
+it can be integrated with code editor
+
+work on vagrant
+vagrant ssh
+
+how to check git
+git --versio
+
+
+mkdir demo-project
+cd /demo project ->git status->not a repository
+
+initialize the git in current directory
+$git init
+
+git status->
+on branch master->to rename master
+git branch -m main
+branch rename failed
+
+how to remove file
+rm filename
+to remove cached file
+rm --cached filename 
+it removes the commit
+
+make a file
+and do ls to check the available file
+git status-> shows branch, commit and nothing to commit,
+vim install_apache.sh
+
+echo"installing apche2"
+sudo apt update
+
+
+git add install_apache.sh
+git status
+it is on staging area
+
+
+git commit -m "adding script to update pkgd db"->-m commmit message
+git commit -m "adding script to update pkgd db"-> it asks for user info
+
+git config --local user.email "abc@gmail.com"->global is required instead of local
+git config --local user.name "abc"-> these are stored in cat .git/config
+
+git status
+After a commit, we can change master to main using
+git branch -m master main
+
+
+how to check remote server git
+git remote -v
+
+create new repository 
+then from setup page copy https/ssh code
+git clone ssh
+
+check if ssh key available or not
+ls -al ~/.ssh/
+if there nothing then
+
+generate a new ssh key
+
+ssh-keygen -t rsa -b 4096 -C "amethystpun98@gmail.com"
+add key on ssh agent 
+eval "$(ssh-agent -s )"
+ssh-add ~/.ssh/id_rsa
+
+add ssh key to github
+cat ~/.ssh/id_rsa.pub
+
+copy and paste it on github settings -> ssh and gpg keys
+
+test ssh connection 
+ssh -T git@github.com
+
+to add existing project to repository
+git remote add origin git@github.com:cygday/devops.git
+git branch -M main
+git push -u origin main
+
+
+
+to check out remote repository
+git remote -v
+
+
+if your config --local user.email is not taken try it with 
+git config --local user.email amethystpun98@gmail.com
+
+git commit -M "first commmit"
+
+for username and password 
+use github's username 
+password -> classic token and tick the repo and user and genereate token
+
+
+edit the file using vim
+then use git status-> use git commit -m "add comment"->git push -u origin main
+
+git log
+git show commitID
+ 
+instead of username and password, we can use passphase for key '/home/vagrant/.ssh/id_rsa':
+
+
+
+
+to authenticate the ssh using passphase
+
+ls -al ~/.ssh/
+ssh-keygen -t rsa
+
+git branching & merging
+git branch
+* main
+search git branching strategy in google
+
+git branch -a=> list locall repository branch
+
+git branch develop - make develop branch
+
+git push origin develop
+git checkout develop - switch to develop branch
+git branch->shows on develop branch
+
+git branch myfeature-a=>make my freature-a branch
+git status
+
+git diff develop myfeature-a
+git merge myfeatire-a
+
+difference between remote and local
+git diff origin/develop develop
+
+delete a branch
+git branch -d myfeature-a
+
+git branch -a
+git log -> list lost
+
+git log --oneline -> list on oneline
+
+git log --online --decorate
+
+branch switch and make 
+git checkout -b myfeature
+
+git merge myfeature --no-ff
+disable fastforward
+
+git push origin develop
+git send to remote repository
+
+to reduce conflicts
+first pull n fetch n push the file
+
+git rebase->update branches with latest code from the target branch
+
+stashing->git stash branchname
+check->git status
+
+git stash apply stash@{1}->recontinue
+git stash list
+git stash pop -> delete
+
+
+git tag->to mark significant events or milestones
+
+git stash list
+git stsash clear
+
+git log --oneline --graph ---decorate ---all
+
+git tag --list
+git tag mytag
+git tag --list
+git log --oneline --graph --decorate --all
+git branch
+git checkout -b release/v1.0
+git branch
+git tag 
+light /annotated tag
+git tag -a v1.0
+git tag --list
+git tag -a v0.8 commitid
+git diff v0.8 v1.0
+git tag -a v0.9 -f commitid
+
+git push origin v0.9
+git push origin :v0.9
+
+cherry pick
+bring in changes from specific commits, can choose one or more commits, we can do git rebase or git merge but it is not good as it merge all 
+
+git checkout develop
+vim file.sh
+df -h
+git status
+git add file.sh
+git commit -m "ading memory usage log"
+git status
+git log --decorate --oneline --graph --all
+git add .
+git commit -m "add message for docker"
+git status
+git log --decorate --all --oneline --graph
+git branch
+git checkout cherrypick-practice
+git cherrypick commitid
+cat file.sh
+
+git squashing->to remove commits
+
+git log --oneline
+git rebase -i HEAD~5
+
+git pull-copies
+
+git repository and make github vagrant code public, readme
+
+
+
+
+TO START THE GIT
+
+sudo apt install git
+
+git init
+git --version 
+git add local_filename
+git status
+git commit -m "comment"
+please tell me who you are 
+
+git config --local user.email"abc@gmail.com"
+git config --local user.name "abc"
+
+git commit -m "comment_done"
+git push origin branch_name
+
+file is uploaded on github
+
+TO VIEW LOG
+git log --oneline
+
+TO DELETE A COMMIT
+git reset --hard HEAD~1->delete top commit
+
+TO EDIT A COMMIT
+git commit --amend -m "an updated commit message"
+
+TO DELETE THE CODE FROM THE GITHUB
+git rm file_name->git commit -m 'why you delet'->git push origin main
+
+
+TO LIST THE BRANCH 
+git branch -a
+
+TO LIST BRANCH OF REMOTE
+git branch -r
+
+TO DELETE A BRANCH 
+git branch -d branch_name
+
+TO JUMP INTO THE NEXT BRANCH
+git checkout -b branch_name
+
+TO UPLOAD FILE FROM A BRANCH
+git add, commit the changes with git commit -m filename, then push the branch to remote repository with git push
+
+TO FORCE THE PUSH 
+git push -f origin branch_name->this will overwrite the remote branch, potentially losing other contributors' changes.
+
+
+ATLASSIAN
+
+The overall flow of Gitflow is:
+git init
+
+1. A develop branch is created from main
+git checkout -b main
+git commit -m main
+git checkout -b develop main
+git commit -m develop
+
+2. A release branch is created from develop
+git checkout -b release develop
+git commit -m release
+
+3. Feature branches are created from develop
+git checkout -b feature develop
+git commit -m feature
+
+4. When a feature is complete it is merged into the develop branch
+git checkout develop
+git merge feature
+git branch -d feature
+
+5. When the release branch is done it is merged into develop and main
+git checkout main
+git merge release
+git checkout develop
+git merge release
+git branch -d release
+
+6. If an issue in main is detected a hotfix branch is created from main
+git checkout -b hotfix main
+git commit -m hotfix
+
+7. Once the hotfix is complete it is merged to both develop and main
+git checkout main
+git merge hotfix
+git checkout develop
+git merge hotfix
+git branch -d hotfix 
+
+
+
+
+git branch -d branchname->to delete the branch
+
+
+
+#######################################################
+
+Vagrant.configure("2") do | config |
+config.vm.box ="ubuntu/xenial64"
+config.vm.network "forwarded_port", guest:80, host:8080
+config.vm.network "forwarded_port", guest:80, host:8080, host_ip:"127.0.0.1"
+config.vm.network "private_network", ip:"192.168.33.10"
+config.vm.network "public_network"
+config.vm.synced_folder "~/Desktop","/home/vagrant/Desktop"
+config.vm.provider "virtualbox" do |vb|
+vb.memory="2048"
+vb.cpus=2
+end
+config.vm.provision "shell", inline:<<-SHELL
+apt-get update
+apt-get install apache2 -y
+end
+
+
+
